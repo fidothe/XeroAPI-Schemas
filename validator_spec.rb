@@ -18,11 +18,12 @@ SCHEMA_BASE = File.expand_path("../v2.00", __FILE__)
 
 RSpec::Matchers.define :validate_against do |validator|
   match do |xml|
-    validator.valid?(xml)
+    @errors = validator.validate(Nokogiri::XML(xml))
+    @errors.empty?
   end
 
   failure_message_for_should do |xml|
-    "expected the document to validate, but it didn't. Validation errors: \n  #{validator.validate(xml).map { |e| e.message }.join("\n  ")}"
+    "expected the document to validate, but it didn't.\nDocument: #{xml}\n\nValidation errors: \n  #{@errors.map { |e| e.message }.join("\n  ")}"
   end
 end
 
@@ -42,13 +43,15 @@ describe "Validating Xero API XML samples against their XML Schemas" do
 
   pages_and_schemas.each do |page, schema|
     describe "Validating '#{page}' samples" do
-      validator = Nokogiri::XML::Schema(File.open(File.join(SCHEMA_BASE, schema)))
       url = URL_BASE + page + '/'
       source = Nokogiri::HTML(open(url))
       samples = source.css('pre.xml').collect { |node| node.text }
+  
+      let(:validator) { Nokogiri::XML::Schema(File.open(File.join(SCHEMA_BASE, schema))) }
+
       samples.each_with_index do |sample, i|
         it "should validate example #{i + 1}" do
-          Nokogiri::XML(sample).should validate_against(validator)
+          sample.should validate_against(validator)
         end
       end
     end
