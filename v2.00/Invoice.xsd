@@ -12,6 +12,7 @@
   <xs:include schemaLocation="CreditNote.xsd" />
 
   <xs:element name="Invoices" nillable="true" type="ArrayOfInvoice" />
+  <xs:element name="Invoice" type="Invoice" />
 
   <xs:complexType name="ArrayOfInvoice">
     <xs:sequence>
