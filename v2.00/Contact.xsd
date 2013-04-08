@@ -9,6 +9,7 @@
   <xs:include schemaLocation="CurrencyCode.xsd" />
     
   <xs:element name="Contacts" nillable="true" type="ArrayOfContact" />
+  <xs:element name="Contact" type="Contact" />
   
   <xs:complexType name="ArrayOfContact">
     <xs:sequence>
